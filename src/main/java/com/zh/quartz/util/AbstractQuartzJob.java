@@ -1,12 +1,8 @@
 package com.zh.quartz.util;
 
-import com.zh.quartz.constant.Constants;
 import com.zh.quartz.constant.ScheduleConstants;
 import com.zh.quartz.domain.SysJob;
-import com.zh.quartz.domain.SysJobLog;
-import com.zh.quartz.service.ISysJobLogService;
 import com.zh.quartz.util.bean.BeanUtils;
-import com.zh.quartz.util.spring.SpringUtils;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -69,30 +65,7 @@ public abstract class AbstractQuartzJob implements Job
      */
     protected void after(JobExecutionContext context, SysJob sysJob, Exception e)
     {
-        Date startTime = threadLocal.get();
         threadLocal.remove();
-
-        final SysJobLog sysJobLog = new SysJobLog();
-        sysJobLog.setJobName(sysJob.getJobName());
-        sysJobLog.setJobGroup(sysJob.getJobGroup());
-        sysJobLog.setInvokeTarget(sysJob.getInvokeTarget());
-        sysJobLog.setStartTime(startTime);
-        sysJobLog.setStopTime(new Date());
-        long runMs = sysJobLog.getStopTime().getTime() - sysJobLog.getStartTime().getTime();
-        sysJobLog.setJobMessage(sysJobLog.getJobName() + " 总共耗时：" + runMs + "毫秒");
-        if (e != null)
-        {
-            sysJobLog.setStatus(Constants.FAIL);
-            String errorMsg = StringUtils.substring(ExceptionUtil.getExceptionMessage(e), 0, 2000);
-            sysJobLog.setExceptionInfo(errorMsg);
-        }
-        else
-        {
-            sysJobLog.setStatus(Constants.SUCCESS);
-        }
-
-        // 写入数据库当中
-        SpringUtils.getBean(ISysJobLogService.class).addJobLog(sysJobLog);
     }
 
     /**

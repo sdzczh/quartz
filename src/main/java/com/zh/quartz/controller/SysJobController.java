@@ -55,6 +55,7 @@ public class SysJobController extends com.ruoyi.common.core.controller.BaseContr
             return AjaxResult.error("cron表达式不正确");
         }
         sysJob.setCreateBy("");
+        sysJob.setConcurrent("1");
         return toAjax(jobService.insertJob(sysJob));
     }
 
